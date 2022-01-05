@@ -27,7 +27,7 @@ namespace CollegeMVC.Controllers.api
             return Ok (new {student});
         }
 
-       
+       [HttpPost]
         public IHttpActionResult Post([FromBody] Student anyStudent)
         {
             addStudentTotable(connectionString, anyStudent);

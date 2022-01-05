@@ -14,82 +14,139 @@ namespace CollegeMVC.Controllers.api
         string connectionString = "Data Source=SHIMONSAMAY;Initial Catalog=CollegeDB;Integrated Security=True;Pooling=False";
 
         public IHttpActionResult Get()
-        {
-            List<Teacher> teachersList = getTechersData(connectionString);
-            return Ok(new { teachersList });
+        { 
+            try
+            {
+                List<Teacher> teachersList = getTechersData(connectionString);
+                return Ok(new { teachersList });
+            }
+            catch(SqlException sqlErr)
+            {
+                return BadRequest(sqlErr.Message);
+            }
+            catch (Exception x)
+            {
+                return BadRequest(x.Message);
+            }
 
         }
-        
+
         public IHttpActionResult Get(int id)
         {
-            Teacher teacher = getTeacherData(connectionString, id);
-                return Ok(new {teacher});
+            try
+            {
+                Teacher teacher = getTeacherData(connectionString, id);
+                return Ok(new { teacher });
+            }
+            catch (SqlException sqlErr)
+            {
+                return BadRequest(sqlErr.Message);
+            }
+            catch (Exception x)
+            {
+                return BadRequest(x.Message);
+            }
+
         }
 
-        
+       [HttpPost]
         public IHttpActionResult Post([FromBody]Teacher value)
         {
-            createTeacher(connectionString, value);
-            List<Teacher> list =  getTechersData(connectionString);
+            try
+            {
+                createTeacher(connectionString, value);
+                List<Teacher> list = getTechersData(connectionString);
                 return Ok(new { list });
+            }
+            catch (SqlException sqlErr)
+            {
+                return BadRequest(sqlErr.Message);
+            }
+            catch(Exception x)
+            {
+                return BadRequest(x.Message);
+            }
         }
 
        [HttpPut]
         public IHttpActionResult Put(int id, [FromBody]Teacher value)
         {
-            updateTeacher(connectionString, value, id);
-            List<Teacher> list = getTechersData(connectionString);
-            return Ok(new { list });
+            try
+            {
+                updateTeacher(connectionString, value, id);
+                List<Teacher> list = getTechersData(connectionString);
+                return Ok(new { list });
+            }
+            catch (SqlException sqlErr)
+            {
+                return BadRequest(sqlErr.Message);
+            }
+            catch (Exception x)
+            {
+                return BadRequest(x.Message);
+            }
         }
 
-       
+       [HttpDelete]
         public IHttpActionResult Delete(int id)
         {
-            delteTeacher(connectionString , id);
-            List<Teacher> teachersList = getTechersData(connectionString);
-            return Ok(new { teachersList });
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        public static List<Teacher> getTechersData(string connection)
-        {
-            List<Teacher> teachersList = new List<Teacher>();
-            using (SqlConnection DBconnection = new SqlConnection(connection))
+            try
             {
-                DBconnection.Open();
-                string query = "SELECT * FROM Teachers";
-                SqlCommand command = new SqlCommand(query, DBconnection);
-                SqlDataReader data = command.ExecuteReader();   
-                if (data.HasRows)
-                {
-                    while (data.Read())
-                    {
-                        teachersList.Add(new Teacher (data.GetString(1) ,
-                                                       data.GetString(2),
-                                                       data.GetString(3),
-                                                       data.GetString(4) ,
-                                                       data.GetInt32(5)));
-                    }
-                    return teachersList;
-                }
-                return teachersList;
+                delteTeacher(connectionString, id);
+                List<Teacher> teachersList = getTechersData(connectionString);
+                return Ok(new { teachersList });
+            }
+            catch (SqlException sqlErr)
+            {
+                return BadRequest(sqlErr.Message);
+            }
+            catch (Exception x)
+            {
+                return BadRequest(x.Message);
             }
         }
 
 
-        public static Teacher getTeacherData (string connection , int id)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private static List<Teacher> getTechersData(string connection)
+        { 
+                List<Teacher> teachersList = new List<Teacher>();
+                using (SqlConnection DBconnection = new SqlConnection(connection))
+                {
+                    DBconnection.Open();
+                    string query = "SELECT * FROM Teachers";
+                    SqlCommand command = new SqlCommand(query, DBconnection);
+                    SqlDataReader data = command.ExecuteReader();
+                    if (data.HasRows)
+                    {
+                        while (data.Read())
+                        {
+                            teachersList.Add(new Teacher(data.GetString(1),
+                                                           data.GetString(2),
+                                                           data.GetString(3),
+                                                           data.GetString(4),
+                                                           data.GetInt32(5)));
+                        }
+                        return teachersList;
+                    }
+                    return teachersList;
+                }
+        }
+
+        private static Teacher getTeacherData (string connection , int id)
         {
             using (SqlConnection DBconnection = new SqlConnection( connection))
             {
@@ -112,9 +169,9 @@ namespace CollegeMVC.Controllers.api
                 DBconnection.Close();
                 return new Teacher();
             }
-        }  
+        }
 
-        public static void createTeacher (string connection ,   Teacher teacher)
+        private static void createTeacher (string connection , Teacher teacher)
         {
             using(SqlConnection DBconnection = new SqlConnection(connection))
             {
@@ -125,9 +182,9 @@ namespace CollegeMVC.Controllers.api
                 command.ExecuteNonQuery();
                 DBconnection.Close ();
             }
-        }  
+        }
 
-        public static void updateTeacher (string connection, Teacher teacher , int id)
+        private static void updateTeacher (string connection, Teacher teacher , int id)
         {
             using (SqlConnection DBconnection = new SqlConnection( connection ))
             {
@@ -146,7 +203,7 @@ namespace CollegeMVC.Controllers.api
             }
         }
 
-        public static void delteTeacher (string connection , int id)
+        private static void delteTeacher (string connection , int id)
         {
             using( SqlConnection DBconnection = new SqlConnection(connection))
             {
@@ -157,6 +214,7 @@ namespace CollegeMVC.Controllers.api
                 DBconnection.Close();
             }
         }
+
     }
 
 
